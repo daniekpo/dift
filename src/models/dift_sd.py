@@ -251,7 +251,7 @@ class SDFeaturizer:
 
 
 class SDFeaturizer4Eval(SDFeaturizer):
-    def __init__(self, sd_id='stabilityai/stable-diffusion-2-1', null_prompt='', cat_list=[]):
+    def __init__(self, sd_id='daniekpo/stable-diffusion-2-1-base', null_prompt='', cat_list=[]):
         super().__init__(sd_id, null_prompt)
         with torch.no_grad():
             cat2prompt_embeds = {}
