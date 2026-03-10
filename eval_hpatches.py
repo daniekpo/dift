@@ -8,8 +8,8 @@ from torch.utils.data import Dataset
 from tqdm import tqdm
 import skimage.io as io
 import torch.nn.functional as F
-from src.models.dift_sd import SDFeaturizer4Eval
-from src.models.dift_adm import ADMFeaturizer4Eval
+from dift.models.dift_sd import SDFeaturizer4Eval
+from dift.models.dift_adm import ADMFeaturizer4Eval
 
 class HPatchDataset(Dataset):
     def __init__(self, imdir, spdir):

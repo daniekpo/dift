@@ -3,8 +3,8 @@ import torch
 from torch.nn import functional as F
 from tqdm import tqdm
 import numpy as np
-from src.models.dift_sd import SDFeaturizer4Eval
-from src.models.dift_adm import ADMFeaturizer4Eval
+from dift.models.dift_sd import SDFeaturizer4Eval
+from dift.models.dift_adm import ADMFeaturizer4Eval
 import os
 import json
 from PIL import Image

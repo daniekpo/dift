@@ -28,8 +28,8 @@ import cv2
 import torch
 from torch.nn import functional as F
 from PIL import Image
-from src.models.dift_sd import SDFeaturizer
-from src.models.dift_adm import ADMFeaturizer
+from dift.models.dift_sd import SDFeaturizer
+from dift.models.dift_adm import ADMFeaturizer
 
 
 @torch.no_grad()
