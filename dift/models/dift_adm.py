@@ -7,12 +7,13 @@ print(f'main path: {main_path}')
 
 import sys
 sys.path.append(os.path.join(main_path, 'guided-diffusion'))
-from guided_diffusion.script_util import create_model_and_diffusion
-from guided_diffusion.nn import timestep_embedding
+
+
 
 
 class ADMFeaturizer:
     def __init__(self):
+        from guided_diffusion.script_util import create_model_and_diffusion
         model, diffusion = create_model_and_diffusion(
             image_size=256,
             class_cond=False,
@@ -53,6 +54,7 @@ class ADMFeaturizer:
                 t=101,
                 up_ft_index=4,
                 ensemble_size=8):
+        from guided_diffusion.nn import timestep_embedding
         model = self.model
         diffusion = self.diffusion
 

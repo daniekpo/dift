@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "dift"
 version = "0.1.0"
 description = "DIFT: Diffusion Features for Dense Correspondence"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 
 [tool.setuptools.packages.find]
 include = ["dift*"]
