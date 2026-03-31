@@ -193,6 +193,35 @@ class OneStepSDPipeline(StableDiffusionPipeline):
         return unet_output
 
 
+def _encode_prompt_compat(
+    pipe,
+    prompt,
+    device,
+    num_images_per_prompt=1,
+    do_classifier_free_guidance=False,
+    negative_prompt=None,
+):
+    if hasattr(pipe, "encode_prompt"):
+        prompt_embeds, negative_prompt_embeds = pipe.encode_prompt(
+            prompt=prompt,
+            device=device,
+            num_images_per_prompt=num_images_per_prompt,
+            do_classifier_free_guidance=do_classifier_free_guidance,
+            negative_prompt=negative_prompt,
+        )
+        if do_classifier_free_guidance and negative_prompt_embeds is not None:
+            return torch.cat([negative_prompt_embeds, prompt_embeds])
+        return prompt_embeds
+
+    return pipe._encode_prompt(
+        prompt=prompt,
+        device=device,
+        num_images_per_prompt=num_images_per_prompt,
+        do_classifier_free_guidance=do_classifier_free_guidance,
+        negative_prompt=negative_prompt,
+    )
+
+
 class SDFeaturizer:
     def __init__(self, sd_id='daniekpo/stable-diffusion-2-1-base', null_prompt='', device='cuda'):
         self.device = device
@@ -207,7 +236,8 @@ class SDFeaturizer:
         onestep_pipe.vae.enable_tiling()
         onestep_pipe.enable_attention_slicing()
         onestep_pipe.enable_xformers_memory_efficient_attention()
-        null_prompt_embeds = onestep_pipe._encode_prompt(
+        null_prompt_embeds = _encode_prompt_compat(
+            onestep_pipe,
             prompt=null_prompt,
             device=self.device,
             num_images_per_prompt=1,
@@ -238,7 +268,8 @@ class SDFeaturizer:
         if prompt == self.null_prompt:
             prompt_embeds = self.null_prompt_embeds
         else:
-            prompt_embeds = self.pipe._encode_prompt(
+            prompt_embeds = _encode_prompt_compat(
+                self.pipe,
                 prompt=prompt,
                 device=self.device,
                 num_images_per_prompt=1,
@@ -261,7 +292,8 @@ class SDFeaturizer4Eval(SDFeaturizer):
             cat2prompt_embeds = {}
             for cat in cat_list:
                 prompt = f"a photo of a {cat}"
-                prompt_embeds = self.pipe._encode_prompt(
+                prompt_embeds = _encode_prompt_compat(
+                    self.pipe,
                     prompt=prompt,
                     device='cuda',
                     num_images_per_prompt=1,

@@ -192,6 +192,35 @@ class OneStepSDPipeline(StableDiffusionPipeline):
         return unet_output
 
 
+def _encode_prompt_compat(
+    pipe,
+    prompt,
+    device,
+    num_images_per_prompt=1,
+    do_classifier_free_guidance=False,
+    negative_prompt=None,
+):
+    if hasattr(pipe, "encode_prompt"):
+        prompt_embeds, negative_prompt_embeds = pipe.encode_prompt(
+            prompt=prompt,
+            device=device,
+            num_images_per_prompt=num_images_per_prompt,
+            do_classifier_free_guidance=do_classifier_free_guidance,
+            negative_prompt=negative_prompt,
+        )
+        if do_classifier_free_guidance and negative_prompt_embeds is not None:
+            return torch.cat([negative_prompt_embeds, prompt_embeds])
+        return prompt_embeds
+
+    return pipe._encode_prompt(
+        prompt=prompt,
+        device=device,
+        num_images_per_prompt=num_images_per_prompt,
+        do_classifier_free_guidance=do_classifier_free_guidance,
+        negative_prompt=negative_prompt,
+    )
+
+
 class SDFeaturizer:
     def __init__(self, sd_id='stabilityai/stable-diffusion-2-1', null_prompt=''):
         unet = MyUNet2DConditionModel.from_pretrained(sd_id, subfolder="unet")
@@ -203,13 +232,15 @@ class SDFeaturizer:
             all_cats = os.listdir('/home/lt453/SPair-71k/JPEGImages')
             for cat in all_cats:
                 prompt = f"a photo of a {cat}"
-                prompt_embeds = onestep_pipe._encode_prompt(
+                prompt_embeds = _encode_prompt_compat(
+                    onestep_pipe,
                     prompt=prompt,
                     device='cpu',
                     num_images_per_prompt=1,
                     do_classifier_free_guidance=False) # [1, 77, dim]
                 cat2prompt[cat] = prompt_embeds
-            null_prompt_embeds = onestep_pipe._encode_prompt(
+            null_prompt_embeds = _encode_prompt_compat(
+                    onestep_pipe,
                     prompt=null_prompt,
                     device='cpu',
                     num_images_per_prompt=1,
